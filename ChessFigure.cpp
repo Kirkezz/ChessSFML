@@ -1,8 +1,8 @@
 #include "ChessFigure.h"
 #include "ChessBoard.h"
-bool p_cm(int x, int y, Figure* f) {
+bool p_cm(int8_t x, int8_t y, Figure* f) {
     ChessBoard& board = *(f->board);
-    int dir = f->isWhite() ? -1 : 1;
+    int8_t dir = f->isWhite() ? -1 : 1;
     if (x - f->xPos == 0 && !board(x, y)) {
         if ((y - f->yPos == 2 * dir && f->moves == 0 && !board(x, y - dir)) || (y - f->yPos == dir)) {
             return 1;
@@ -19,66 +19,61 @@ bool p_cm(int x, int y, Figure* f) {
     }
     return 0;
 }
-const Square moves[8] = { {-1, 2}, {-1, -2}, {1, 2}, {1, -2}, {-2, 1}, {-2, -1}, {2, 1}, {2, -1} };
-bool n_cm(int x, int y, Figure* f) {
-    x -= f->xPos; y -= f->yPos;
-    for (int i = 0; i < 8; ++i) {
-        if (x == moves[i].x && y == moves[i].y)
-            return 1;
-    }
-    return 0;
+bool n_cm(int8_t x, int8_t y, Figure* f) {
+    x = abs(x - f->xPos); y = abs(y - f->yPos);
+    return (x == 2 && y == 1) || (x == 1 && y == 2);
 }
-bool b_cm(int x, int y, Figure* f) {
+bool b_cm(int8_t x, int8_t y, Figure* f) {
     ChessBoard& board = *(f->board);
     if (abs(x - f->xPos) == abs(y - f->yPos)) {
         if (f->xPos > x && f->yPos > y)
-            for (int i = 1; i < 8; ++i)
+            for (int8_t i = 1; i < 8; ++i)
                 if (board(f->xPos - i, f->yPos - i) || f->xPos - i == 0 || f->yPos - i == 0)
                     return f->xPos - i <= x && f->yPos - i <= y;
         if (f->xPos > x && f->yPos < y)
-            for (int i = 1; i < 8; ++i)
+            for (int8_t i = 1; i < 8; ++i)
                 if (board(f->xPos - i, f->yPos + i) || f->xPos - i == 0 || f->yPos + i == 7)
                     return f->xPos - i <= x && f->yPos + i >= y;
         if (f->xPos < x && f->yPos > y)
-            for (int i = 1; i < 8; ++i)
+            for (int8_t i = 1; i < 8; ++i)
                 if (board(f->xPos + i, f->yPos - i) || f->xPos + i == 7 || f->yPos - i == 0)
                     return f->xPos + i >= x && f->yPos - i <= y;
         if (f->xPos < x && f->yPos < y)
-            for (int i = 1; i < 8; ++i)
+            for (int8_t i = 1; i < 8; ++i)
                 if (board(f->xPos + i, f->yPos + i) || f->xPos + i == 7 || f->yPos + i == 7)
                     return f->xPos + i >= x && f->yPos + i >= y;
     }
     return 0;
 }
-bool r_cm(int x, int y, Figure* f) {
+bool r_cm(int8_t x, int8_t y, Figure* f) {
     ChessBoard& board = *(f->board);
     if (x == f->xPos && y < f->yPos)
-        for (int i = f->yPos - 1; i > -1; --i)
+        for (int8_t i = f->yPos - 1; i > -1; --i)
             if (board(f->xPos, i) || i == 0)
                 return y >= i;
     if (x == f->xPos && y > f->yPos)
-        for (int i = f->yPos + 1; i < 8; ++i)
+        for (int8_t i = f->yPos + 1; i < 8; ++i)
             if (board(f->xPos, i) || i == 7)
                 return y <= i;
     if (x < f->xPos && y == f->yPos)
-        for (int i = f->xPos - 1; i > -1; --i)
+        for (int8_t i = f->xPos - 1; i > -1; --i)
             if (board(i, f->yPos) || i == 0)
                 return x >= i;
     if (x > f->xPos && y == f->yPos)
-        for (int i = f->xPos + 1; i < 8; ++i)
+        for (int8_t i = f->xPos + 1; i < 8; ++i)
             if (board(i, f->yPos) || i == 7)
                 return x <= i;
     return 0;
 }
-bool q_cm(int x, int y, Figure* f) {
+bool q_cm(int8_t x, int8_t y, Figure* f) {
     return r_cm(x, y, f) || b_cm(x, y, f);
 }
-bool k_cm(int x, int y, Figure* f) {
+bool k_cm(int8_t x, int8_t y, Figure* f) {
     ChessBoard& board = *(f->board);
     if (abs(x - f->xPos) < 2 && abs(y - f->yPos) < 2) {
         return 1;
     }
-    int xDir = (x < f->xPos) ? -1 : 1, rookX = xDir == -1 ? 0 : 7;
+    int8_t xDir = (x < f->xPos) ? -1 : 1, rookX = xDir == -1 ? 0 : 7;
     if (abs(x - f->xPos) == 2 && f->yPos == y
             && f->moves == 0 && board(rookX, y).moves == 0
             && !board(x, y) && !board(f->xPos + xDir, y)
@@ -95,12 +90,12 @@ bool k_cm(int x, int y, Figure* f) {
 
     return 0;
 }
-bool (*canMoveArr[6])(int, int, Figure*) = {p_cm, n_cm, b_cm, r_cm, q_cm, k_cm};
-Figure::Figure(ChessBoard* board, int type, int x, int y) : board(board), xPos(x), yPos(y), type(type) {
+bool (*canMoveArr[])(int8_t, int8_t, Figure*) = {p_cm, n_cm, b_cm, r_cm, q_cm, k_cm};
+Figure::Figure(ChessBoard* board, int8_t type, int8_t x, int8_t y) : board(board), xPos(x), yPos(y), type(type) {
     canMove = canMoveArr[type / 2];
     color = type % 2;
 }
-void Figure::updatePos(int x, int y) {
+void Figure::updatePos(int8_t x, int8_t y) {
     lastX = xPos;
     lastY = yPos;
     xPos = x;
@@ -110,7 +105,7 @@ void Figure::updatePos(int x, int y) {
         updateType(WHITE_QUEEN + color);
     }
 }
-void Figure::updateType(int newType) {
+void Figure::updateType(int8_t newType) {
     type = newType;
     canMove = canMoveArr[type / 2];
 }

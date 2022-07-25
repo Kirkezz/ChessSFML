@@ -83,6 +83,8 @@ void ChessRenderer::LMBReleased(int x, int y) {
 	y /= figureSize;
 	if (pinned && isValid(x, y)) {
 		if (board->move(pinned->xPos, pinned->yPos, x, y)) {
+			if (autoFlip)
+				flipBoard();
 			animations.clear();
 			if (hPin) {
 				animateMove(pinned->xPos, pinned->yPos, x, y);
@@ -92,10 +94,8 @@ void ChessRenderer::LMBReleased(int x, int y) {
 			if (pinned->type == WHITE_KING || pinned->type == BLACK_KING && abs(lastMove.first.x - lastMove.second.x) == 2) {
 				int rookY = 7 - 7 * pinned->color;
 				if (lastMove.second.x == 2) {
-					cout << (*board)(3, rookY).type << endl;
 					animateMove(0, rookY, 3, rookY);
 				} else if(lastMove.second.x == 6) {
-					cout << (*board)(5, rookY).type << endl;
 					animateMove(7, rookY, 5, rookY);
 				}
 			}

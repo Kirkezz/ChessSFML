@@ -23,10 +23,11 @@ class ChessRenderer {
 public:
 	ChessRenderer(sf::RenderWindow& window, ChessBoard* board = nullptr);
 	~ChessRenderer();
+    sf::Color lightBGColor = sf::Color(225, 225, 200), DarkBGColor = sf::Color(245, 110, 110);
 	void draw(int mouseX, int mouseY);
-	sf::Color lightBGColor = sf::Color(225, 225, 200), DarkBGColor = sf::Color(245, 110, 110);
 	void LMBPressed(int x, int y);
     void LMBReleased(int x, int y);
+    bool autoFlip = false;
     void flipBoard() {
         isBoardFlipped = !isBoardFlipped;
         sf::View t = window.getView(); t.rotate(180); window.setView(t);
@@ -36,15 +37,6 @@ public:
         board = new ChessBoard;
         pinned = nullptr;
         animations.clear();
-    }
-    void makeRandomMove() {
-        int a[4];
-        int i = 10000;
-        do {
-            for (int i = 0; i < 4; ++i)
-                a[i] = rand() % boardSize;
-            --i;
-        } while (!board->move(a[0], a[1], a[2], a[3]) && i);
     }
 private:
     void animateMove(int x, int y, int toX, int toY);

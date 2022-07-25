@@ -1,6 +1,5 @@
 #pragma once
-#include <cstdint>
-#include <iostream>
+#include <inttypes.h>
 class ChessBoard;
 enum figures {
     WHITE_PAWN = 0,
@@ -18,16 +17,15 @@ enum figures {
     NOTHING = 12
 };
 struct Square {
-    int x, y;
+    int8_t x, y;
 };
 class Figure {
 public:
-    int xPos, yPos, lastX, lastY;
+    int8_t xPos, yPos, lastX, lastY, type;
     unsigned moves = 0;
-    int type;
     bool color;
-    Figure(ChessBoard* board = nullptr, int type = NOTHING, int x = -1, int y = -1);
-    bool canMoveTo(int toX, int toY) {
+    Figure(ChessBoard* board = nullptr, int8_t type = NOTHING, int8_t x = -1, int8_t y = -1);
+    bool canMoveTo(int8_t toX, int8_t toY) {
         return canMove(toX, toY, this);
     }
     bool isWhite() { return !color; }
@@ -39,14 +37,14 @@ public:
         return f.xPos == xPos && f.yPos == yPos;
     }
     bool operator!=(Figure f) {
-        return !(this->operator==(f));
+        return f.xPos != xPos || f.yPos != yPos;
     }
     void reset() {
         type = NOTHING;
     }
-    void updatePos(int x, int y);
-    void updateType(int newType);
+    void updatePos(int8_t x, int8_t y);
+    void updateType(int8_t newType);
     ChessBoard* board;
 private:
-    bool (*canMove) (int, int, Figure*);
+    bool (*canMove) (int8_t, int8_t, Figure*);
 };

@@ -1,8 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "ChessRenderer.h"
 using namespace sf;
-#include <iostream>
-using namespace std;
 
 int main() {
     RenderWindow window(VideoMode(768, 768), "Chess");
@@ -18,10 +16,10 @@ int main() {
             if (event.type == event.MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
                 chess.LMBPressed(mouse.x, mouse.y);
             }
-            if (event.type == event.MouseButtonReleased && event.mouseButton.button == Mouse::Left) {
+            else if (event.type == event.MouseButtonReleased && event.mouseButton.button == Mouse::Left) {
                 chess.LMBReleased(mouse.x, mouse.y);
             }
-            if (event.type == Event::KeyPressed) {
+            else if (event.type == Event::KeyPressed) {
                 switch (event.key.code) {
                 case Keyboard::F:
                     chess.flipBoard();
@@ -30,7 +28,7 @@ int main() {
                     chess.resetBoard();
                     break;
                 case Keyboard::A:
-                    chess.makeRandomMove();
+                    chess.autoFlip = !chess.autoFlip;
                     break;
                 }
             }
